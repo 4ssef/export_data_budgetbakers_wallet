@@ -24,7 +24,6 @@ EMAIL = os.getenv('BUDGETBAKERS_WALLET_EMAIL')
 PASSWORD = os.getenv('BUDGETBAKERS_WALLET_PASSWORD')
 BASE_CSS_SELECTOR = '#root > div > div > section > div > form >'
 RECORD_DATA = ['date', 'type', 'category', 'account', 'description', 'label', 'amount']
-MAX_SCROLLS = 12
 
 # ===============================================
 # Inicializa instancia del webdriver.
@@ -53,9 +52,9 @@ script = "window.scrollTo(0, document.body.scrollHeight);"
 
 # scrollea la página hasta que no hayan fechas nuevas
 while True:
-    old_dates = f.get_dates(driver) # obtiene las fechas originales
+    old_dates = f.get_qty_dates(driver) # obtiene las fechas originales
     driver.execute_script(script) # scroll hasta el final
-    new_dates = f.get_dates(driver) # obtiene las fechas después de scrollear
+    new_dates = f.get_qty_dates(driver) # obtiene las fechas después de scrollear
     
     if old_dates == new_dates:
         break

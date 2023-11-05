@@ -15,7 +15,7 @@ from selenium.webdriver.common.by import By
 # Retorna la cantidad de fechas del apartado de 
 # 'Records' en Wallet
 # ===============================================
-def get_dates(driver):
+def get_qty_dates(driver):
     selector = '.MhNEgOnlVNRo3U-Ti1ZHP' # CSS selector de las fechas en Wallet
     return len(driver.find_elements(By.CSS_SELECTOR, selector))
 
