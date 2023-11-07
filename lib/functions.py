@@ -30,19 +30,6 @@ def get_records(driver):
     return [record.text.split('\n') for record in driver.find_elements(By.CSS_SELECTOR, selector)]
 
 # ===============================================
-# Definición clase Record para las transacciones.
-# ===============================================
-class Record:
-    def __init__(self, date, type, category, account, description, label, amount):
-        self.date = date
-        self.type = type
-        self.category = category
-        self.account = account
-        self.description = description
-        self.label = label
-        self.amount = amount
-
-# ===============================================
 # Retorna lista de fechas de las transacciones.
 # ===============================================
 def get_dates(driver):
