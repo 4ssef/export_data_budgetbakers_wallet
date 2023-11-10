@@ -1,0 +1,11 @@
+date
+category
+account
+optional: desc
+optional: label
+[
+
+
+
+]
+amount
