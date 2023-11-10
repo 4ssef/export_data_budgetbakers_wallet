@@ -1,4 +1,3 @@
-date
 category
 account
 optional: desc
@@ -8,4 +7,5 @@ optional: label
 
 
 ]
-amount
+optional: base currency amount
+main currency amount
