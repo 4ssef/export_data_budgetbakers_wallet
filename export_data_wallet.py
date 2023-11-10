@@ -1,5 +1,6 @@
 import os
 import lib.functions as f
+from lib.record import Record
 from selenium import webdriver as webdriver
 from selenium.webdriver.common.by import By
 from pathlib import Path
@@ -34,8 +35,6 @@ options.add_argument('--headless=new') # ejecuta el webdriver minimizadamente
 options.add_experimental_option('prefs', {'intl.accept_languages': 'es'}) # ejecuta el driver con español como lenguaje preferido
 driver = webdriver.Edge(options = options)
 
-#region PREPARE_EXTRACTION
-
 # ===============================================
 # Prepara la página para extracción de los
 # registros.
@@ -52,31 +51,40 @@ script = "window.scrollTo(0, document.body.scrollHeight);"
 
 # scrollea la página hasta que no hayan fechas nuevas
 while True:
-    old_dates = f.get_qty_dates(driver) # obtiene las fechas originales
+    old_dates = len(f.get_dates(driver)) # cantidad de fechas originales
     driver.execute_script(script) # scroll hasta el final
-    new_dates = f.get_qty_dates(driver) # obtiene las fechas después de scrollear
+    new_dates = len(f.get_dates(driver)) # cantidad de fechas después de scrollear
     
     if old_dates == new_dates:
         break
-
-#endregion PREPARE_EXTRACTION
-
-#region DATA_EXTRACTION
 
 # ===============================================
 # Extracción de los registros.
 # ===============================================
 
-accs = f.get_accounts(driver)
+# accs = f.get_accounts(driver) # lista de cuentas
 records = f.get_records(driver) # lista de transacciones
-
-#endregion DATA_EXTRACTION
-
-#region DATA_TRANSFORMATION
+dates = [f.clean_date(date) for date in f.get_dates(driver)] # lista de fechas
+tuples = f.get_tuples_list(driver, dates) # lista de tuples
 
 # ===============================================
-# Transforma las transacciones en objetos de tipo 
-# Record (limpieza de datos en general).
+# Construye el objeto Record.
 # ===============================================
 
-#endregion DATA_TRANSFORMATION
+count = 0
+
+for t in range(len(tuples)):
+    for record in records:
+        # define campos de las transacciones
+        date = dates[t] # fecha
+        cat = record[0] # categoría
+        acc = record[1] # cuenta principal
+        amount = record[-1] # monto
+        
+        # condición para salir del 2do for anidado
+        if count == tuples[t][1]:
+            count = 0
+            break
+        count += 1
+        
+        a = Record(date, None, cat, acc, None, None, amount)
