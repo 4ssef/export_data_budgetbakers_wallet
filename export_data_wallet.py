@@ -62,9 +62,8 @@ while True:
 # Extracción de los registros.
 # ===============================================
 
-# accs = f.get_accounts(driver) # lista de cuentas
 records = f.get_records(driver) # lista de transacciones
-dates = [f.clean_date(date) for date in f.get_dates(driver)] # lista de fechas
+dates = [f.clean_date(date) for date in f.get_dates(driver)] # lista de fechas limpias
 tuples = f.get_tuples_list(driver, dates) # lista de tuples
 
 # ===============================================
@@ -77,14 +76,18 @@ for t in range(len(tuples)):
     for record in records:
         # define campos de las transacciones
         date = dates[t] # fecha
+        _type = None
         cat = record[0] # categoría
         acc = record[1] # cuenta principal
+        desc = None
+        labels = None
         amount = record[-1] # monto
         
         # condición para salir del 2do for anidado
         if count == tuples[t][1]:
             count = 0
             break
-        count += 1
         
-        a = Record(date, None, cat, acc, None, None, amount)
+        transaction = Record(date, _type, cat, acc, desc, labels, amount)
+        
+        count += 1
