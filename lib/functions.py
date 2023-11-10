@@ -12,29 +12,34 @@ from selenium import webdriver as webdriver
 from selenium.webdriver.common.by import By
 from datetime import datetime, timedelta
 
+# ===============================================
+# Variables globales
+# ===============================================
+
 ACTUAL_YEAR = datetime.now().year
+ACCOUNTS_SELECTOR = '#root > div > div > main > div > div._5NFnhpp7joa9CQoFA2Fw- > div._14RWKiNFwtHCO_ubRsTZ57 > div:nth-child(3) > div > div:nth-child(4)' # CSS selector de las cuentas
+RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa' # CSS selector de las transacciones
+DATES_SELECTOR = '.MhNEgOnlVNRo3U-Ti1ZHP' # CSS selector de las fechas
+DATES_XPATH = '/html/body/div/div/div/main/div/div[2]/div[2]/div' # full xpath de cada sección de los parent div de fechas
 
 # ===============================================
 # Retorna la lista de las cuentas del usuario.
 # ===============================================
 def get_accounts(driver):
-    selector = '#root > div > div > main > div > div._5NFnhpp7joa9CQoFA2Fw- > div._14RWKiNFwtHCO_ubRsTZ57 > div:nth-child(3) > div > div:nth-child(4)'
-    return [i.text for i in driver.find_elements(By.CSS_SELECTOR, selector)][0].split('\n')[3:]
+    return [i.text for i in driver.find_elements(By.CSS_SELECTOR, ACCOUNTS_SELECTOR)][0].split('\n')[3:]
 
 # ===============================================
 # Retorna una lista de listas donde estas últimas
 # son las transacciones (records).
 # ===============================================
 def get_records(driver):
-    selector = '._3wwqabSSUyshePYhPywONa' # CSS selector de las transacciones
-    return [record.text.split('\n') for record in driver.find_elements(By.CSS_SELECTOR, selector)]
+    return [record.text.split('\n') for record in driver.find_elements(By.CSS_SELECTOR, RECORDS_SELECTOR)]
 
 # ===============================================
 # Retorna lista de fechas de las transacciones.
 # ===============================================
 def get_dates(driver):
-    selector = '.MhNEgOnlVNRo3U-Ti1ZHP' # CSS selector de las fechas en Wallet
-    return [date.text for date in driver.find_elements(By.CSS_SELECTOR, selector)]
+    return [date.text for date in driver.find_elements(By.CSS_SELECTOR, DATES_SELECTOR)]
 
 # ===============================================
 # Retorna la fecha de string en objeto datetime.
@@ -59,9 +64,8 @@ def clean_date(date_str: str):
 # ===============================================
 def get_tuples_list(driver, dates):
     data = []
-    xpath = '/html/body/div/div/div/main/div/div[2]/div[2]/div'
     for i in range(len(dates)): # itera sobre las fechas
-        parent_div = driver.find_element(By.XPATH, f'{xpath}/div[{i+2}]') # divs de divisiones por fecha
+        parent_div = driver.find_element(By.XPATH, f'{DATES_XPATH}/div[{i+2}]') # divs de divisiones por fecha
         child_divs = len(parent_div.find_elements(By.XPATH, './div')) - 1 # cantidad de divs adentro de cada bloque
         data.append((i, child_divs)) # agrega a la lista el tuple (posición fecha, cantidad de elementos dentro)
     return data
