@@ -14,3 +14,9 @@ test.py
 # Directorio de caché.
 # ===============================================
 lib/__pycache__
+
+# ===============================================
+# Archivos personales de prueba
+# ===============================================
+output.xlsx
+file_name.xlsx
