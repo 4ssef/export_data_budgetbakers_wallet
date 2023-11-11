@@ -28,7 +28,7 @@ BASE_CSS_SELECTOR = '#root > div > div > section > div > form >'
 RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa > ._3oJhqSCX8H5S0i6pA59f9k' # CSS selector de las transacciones
 RECORDS_DATA = ['date', 'type', 'category', 'account', 'description', 'label', 'currency', 'amount']
 
-#region WEBSCRAPING
+#region EXTRACCIÓN DATOS WEB SCRAPING
 
 # ===============================================
 # Inicializa instancia del webdriver.
@@ -80,7 +80,9 @@ tuples = f.get_tuples_list(driver, dates) # lista de tuples
 
 driver.close()
 
-#endregion WEBSCRAPING
+#endregion EXTRACCIÓN DATOS WEB SCRAPING
+
+#region LIMPIEZA DATOS
 
 # ===============================================
 # Construye el objeto Record.
@@ -133,6 +135,17 @@ for t in range(len(tuples)):
         
         aux += 1
         count += 1
-        
+
+#endregion LIMPIEZA DATOS
+
+#region SALIDA DE DATOS
+
+# ===============================================
+# Transformación datos a DataFrame y 
+# posteriormente a .xlsx.
+# ===============================================
+
 dataframe = pd.DataFrame.from_dict(all_records)
-dataframe.to_excel('file_name.xlsx', index = False)
+dataframe.to_excel('records.xlsx', index = False)
+
+#endregion SALIDA DE DATOS
