@@ -56,11 +56,7 @@ def get_records(record: WebElement, driver):
             lista.append(None)
         else:
             for child in children:
-                # si hay más de 1 label, las convierte en lista
-                if "\n" in child.text:
-                    lista.append(child.text.split('\n'))
-                else:
-                    lista.append(child.text)
+                lista.append(child.text.replace('\n', ','))
     return lista
 
 # ===============================================

@@ -26,6 +26,7 @@ EMAIL = os.getenv('BUDGETBAKERS_WALLET_EMAIL')
 PASSWORD = os.getenv('BUDGETBAKERS_WALLET_PASSWORD')
 BASE_CSS_SELECTOR = '#root > div > div > section > div > form >'
 RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa > ._3oJhqSCX8H5S0i6pA59f9k' # CSS selector de las transacciones
+RECORDS_DATA = ['date', 'type', 'category', 'account', 'description', 'label', 'currency', 'amount']
 
 #region WEBSCRAPING
 
@@ -87,6 +88,7 @@ driver.close()
 
 count = 0
 aux = 0 # auxiliar para ver donde quedó el 2do for
+all_records = []
 
 for t in range(len(tuples)):
     for record in range(aux, len(records)):
@@ -127,9 +129,10 @@ for t in range(len(tuples)):
             'amount': tr.amount
         }
         
-        # ===============================================
-        # ACÁ AGREGAR EL DICCIONARIO A DATAFRAME
-        # ===============================================
+        all_records.append(data)
         
         aux += 1
         count += 1
+        
+dataframe = pd.DataFrame.from_dict(all_records)
+dataframe.to_excel('file_name.xlsx', index = False)
