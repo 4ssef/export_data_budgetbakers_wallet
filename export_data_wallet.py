@@ -2,12 +2,12 @@ import os
 import lib.functions as f
 import pandas as pd
 from lib.record import Record
+import lib.locators as lctr
 from selenium import webdriver as webdriver
 from selenium.webdriver.common.by import By
 from pathlib import Path
 from dotenv import load_dotenv
 from time import sleep
-from pprint import pprint
 
 load_dotenv()
 
@@ -24,9 +24,6 @@ PROJECT_PATH = Path(__file__).resolve().parent
 URL = 'https://web.budgetbakers.com/records'
 EMAIL = os.getenv('BUDGETBAKERS_WALLET_EMAIL')
 PASSWORD = os.getenv('BUDGETBAKERS_WALLET_PASSWORD')
-BASE_CSS_SELECTOR = '#root > div > div > section > div > form >'
-RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa > ._3oJhqSCX8H5S0i6pA59f9k' # CSS selector de las transacciones
-RECORDS_DATA = ['date', 'type', 'category', 'account', 'description', 'label', 'currency', 'amount']
 
 #region EXTRACCIÓN DATOS WEB SCRAPING
 
@@ -46,9 +43,9 @@ driver = webdriver.Edge(options = options)
 
 driver.get(URL)
 sleep(6)
-driver.find_element(By.CSS_SELECTOR, f'{BASE_CSS_SELECTOR} div:nth-child(1) > div > input[type=email]').send_keys(EMAIL) # escribe el correo
-driver.find_element(By.CSS_SELECTOR, f'{BASE_CSS_SELECTOR} div:nth-child(2) > div > input[type=password]').send_keys(PASSWORD) # escribe la password
-driver.find_element(By.CSS_SELECTOR, f'{BASE_CSS_SELECTOR} button').click() # click en log in
+driver.find_element(By.CSS_SELECTOR, lctr.EMAIL).send_keys(EMAIL) # escribe el correo
+driver.find_element(By.CSS_SELECTOR, lctr.PASSWORD).send_keys(PASSWORD) # escribe la password
+driver.find_element(By.CSS_SELECTOR, lctr.LOGIN_BUTTON).click() # click en log in
 sleep(6)
 
 script = "window.scrollTo(0, document.body.scrollHeight);"
@@ -67,7 +64,7 @@ while True:
 # Extracción de los registros.
 # ===============================================
 
-web_records = driver.find_elements(By.CSS_SELECTOR, RECORDS_SELECTOR)
+web_records = driver.find_elements(By.CSS_SELECTOR, lctr.RECORDS)
 
 records = [f.get_records(record, driver) for record in web_records]
 dates = [f.clean_date(date) for date in f.get_dates(driver)] # lista de fechas limpias
