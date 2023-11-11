@@ -146,6 +146,6 @@ for t in range(len(tuples)):
 # ===============================================
 
 dataframe = pd.DataFrame.from_dict(all_records)
-dataframe.to_excel('records.xlsx', index = False)
+dataframe.to_excel(os.path.join(PROJECT_PATH, 'output', 'records.xlsx'), index = False)
 
 #endregion SALIDA DE DATOS
