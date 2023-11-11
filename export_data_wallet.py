@@ -1,5 +1,6 @@
 import os
 import lib.functions as f
+import pandas as pd
 from lib.record import Record
 from selenium import webdriver as webdriver
 from selenium.webdriver.common.by import By
@@ -24,7 +25,9 @@ URL = 'https://web.budgetbakers.com/records'
 EMAIL = os.getenv('BUDGETBAKERS_WALLET_EMAIL')
 PASSWORD = os.getenv('BUDGETBAKERS_WALLET_PASSWORD')
 BASE_CSS_SELECTOR = '#root > div > div > section > div > form >'
-RECORD_DATA = ['date', 'type', 'category', 'account', 'description', 'label', 'amount']
+RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa > ._3oJhqSCX8H5S0i6pA59f9k' # CSS selector de las transacciones
+
+#region WEBSCRAPING
 
 # ===============================================
 # Inicializa instancia del webdriver.
@@ -58,36 +61,75 @@ while True:
     if old_dates == new_dates:
         break
 
+
 # ===============================================
 # Extracción de los registros.
 # ===============================================
 
-records = f.get_records(driver) # lista de transacciones
+web_records = driver.find_elements(By.CSS_SELECTOR, RECORDS_SELECTOR)
+
+records = [f.get_records(record, driver) for record in web_records]
 dates = [f.clean_date(date) for date in f.get_dates(driver)] # lista de fechas limpias
 tuples = f.get_tuples_list(driver, dates) # lista de tuples
+
+# ===============================================
+# Finaliza instancia del webdriver y proceso 
+# webscraping.
+# ===============================================
+
+driver.close()
+
+#endregion WEBSCRAPING
 
 # ===============================================
 # Construye el objeto Record.
 # ===============================================
 
 count = 0
+aux = 0 # auxiliar para ver donde quedó el 2do for
 
 for t in range(len(tuples)):
-    for record in records:
-        # define campos de las transacciones
-        date = dates[t] # fecha
-        _type = None
-        cat = record[0] # categoría
-        acc = record[1] # cuenta principal
-        desc = None
-        labels = None
-        amount = record[-1] # monto
-        
+    for record in range(aux, len(records)):
         # condición para salir del 2do for anidado
         if count == tuples[t][1]:
             count = 0
             break
+
+        # define campos de las transacciones
+        date = dates[t] # fecha
+        cat = records[record][0] # categoría
+        acc = records[record][1] # cuenta principal
+        desc = records[record][2] # descripción
+        labels = records[record][3] # lista de labels
+        amount = records[record][4] # monto
+        # asigna la moneda
+        if 'MX$' in amount:
+            currency = 'MXN'
+        elif '$' in amount:
+            currency = 'USD'
+        # asigna el tipo
+        if '-' in amount:
+            _type = 'Expense'
+        else:
+            _type = 'Income'
+        amount = f.clean_amount(amount)
         
-        transaction = Record(date, _type, cat, acc, desc, labels, amount)
+        tr = Record(date, _type, cat, acc, desc, labels, currency, amount)
         
+        data = {
+            'date': tr.date,
+            'type': tr.type,
+            'category': tr.category,
+            'account': tr.account,
+            'description': tr.description,
+            'label': tr.label,
+            'currency': tr.currency,
+            'amount': tr.amount
+        }
+        
+        # ===============================================
+        # ACÁ AGREGAR EL DICCIONARIO A DATAFRAME
+        # ===============================================
+        
+        aux += 1
         count += 1
