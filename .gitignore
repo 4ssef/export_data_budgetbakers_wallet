@@ -16,7 +16,7 @@ test.py
 lib/__pycache__
 
 # ===============================================
-# Archivos personales de prueba
+# Archivos resultantes.
 # ===============================================
 output.xlsx
-file_name.xlsx
+/output
