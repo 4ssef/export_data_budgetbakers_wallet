@@ -10,6 +10,7 @@ del archivo principal 'export_data_wallet.py
 
 from selenium import webdriver as webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from datetime import datetime, timedelta
 
 # ===============================================
@@ -18,9 +19,15 @@ from datetime import datetime, timedelta
 
 ACTUAL_YEAR = datetime.now().year
 ACCOUNTS_SELECTOR = '#root > div > div > main > div > div._5NFnhpp7joa9CQoFA2Fw- > div._14RWKiNFwtHCO_ubRsTZ57 > div:nth-child(3) > div > div:nth-child(4)' # CSS selector de las cuentas
-RECORDS_SELECTOR = '._3wwqabSSUyshePYhPywONa' # CSS selector de las transacciones
 DATES_SELECTOR = '.MhNEgOnlVNRo3U-Ti1ZHP' # CSS selector de las fechas
 DATES_XPATH = '/html/body/div/div/div/main/div/div[2]/div[2]/div' # full xpath de cada sección de los parent div de fechas
+CLASSES_SELECTORS = {
+    'category': '._1Q3dkM4Dh6bjIxICrBMsvZ',
+    'account': '.haztXbqN9W6_Sa8X7ZjHh',
+    'desc': '.qcICMAjXBzU_8kvhCu6Ir',
+    'labels': '._2yWsrOsWf0KGrXIxhhDI2I > ._3qB8ZxU3QZU1r0vgpc39K_',
+    'amount': '.zh61r2aVULGpP5-PnSAHX > ._2incM6fyIxbGkeydtYoltF',
+    }
 
 # ===============================================
 # Retorna la lista de las cuentas del usuario.
@@ -29,11 +36,27 @@ def get_accounts(driver):
     return [i.text for i in driver.find_elements(By.CSS_SELECTOR, ACCOUNTS_SELECTOR)][0].split('\n')[3:]
 
 # ===============================================
-# Retorna una lista de listas donde estas últimas
-# son las transacciones (records).
+# Retorna una lista donde cada elemento es el 
+# campo correspondiente para la transacción dada
+# en el argumento.
 # ===============================================
-def get_records(driver):
-    return [record.text.split('\n') for record in driver.find_elements(By.CSS_SELECTOR, RECORDS_SELECTOR)]
+def get_records(record: WebElement, driver):
+    lista = []
+    
+    for selector in CLASSES_SELECTORS.values(): # itera sobre las clases
+        # ===============================================
+        # children es una lista de elementos dentro de 
+        # los valores de CLASSES_SELECTORS.
+        # ===============================================
+        children = record.find_elements(By.CSS_SELECTOR, selector)
+        
+        for child in children:
+            # si hay más de 1 label, las convierte en lista
+            if "\n" in child.text:
+                lista.append(child.text.split('\n'))
+            else:
+                lista.append(child.text)
+    return lista
 
 # ===============================================
 # Retorna lista de fechas de las transacciones.
