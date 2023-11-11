@@ -97,3 +97,9 @@ def get_tuples_list(driver, dates):
         child_divs = len(parent_div.find_elements(By.XPATH, './div')) - 1 # cantidad de divs adentro de cada bloque
         data.append((i, child_divs)) # agrega a la lista el tuple (posición fecha, cantidad de elementos dentro)
     return data
+
+# ===============================================
+# Retorna el monto limpio como float()
+# ===============================================
+def clean_amount(str_amount: str):
+    return float(str_amount.replace('$', '').replace('MX', '').replace(',', ''))
